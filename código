@@ -1,0 +1,702 @@
+use std::fs::File;
+use std::io::stdin;
+use std::path::Path;
+use std::io::Read;
+use std::fs::OpenOptions;
+use std::io::Write;
+use std::fs;
+use rand::prelude::*;
+// Amanda Pérez, Francisco Abdala
+
+//Estructura utilizada para ingresar los datos al archivo de texto.
+#[derive(Default)]
+struct Inventario{
+    //Código único del libro.
+    codigo: String,
+    //Nombre del libro.
+    nombre: String,
+    //Autor del libro
+    autor: String,
+    //Editorial del libro.
+    editorial: String,
+    //Género del libro.
+    genero: String,
+    //Idioma del libro.
+    idioma: String,
+    //Edición del libro.
+    edicion: String,
+    //Precio del libro.
+    precio: i32,
+    //Cantidad disponible del libro.
+    stock: i32,
+    //Cantidad vendida del libro.
+    vendido: i32,
+}
+
+//En esta función se generan códigos alfanuméricos únicos.
+fn generador_codigo()-> String{
+    //Se transforma el archivo para ser leído como string.
+    let texto = fs::read_to_string("Inventario.csv").expect("No se pudo abrir el archivo.");
+
+    loop{
+        //Lista de abecedario de la cual se eligen 3 letras para generar el código.
+        let lista_abecedario = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+                             "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+        //Lista de números de la cual se eligen 3 números para generar el código.
+        let lista_numero = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+        //Variable para utilizar el método random.
+        let mut rng = rand::thread_rng();
+        //En el vector se agregan 3 letras elegidas por le azar.
+        let vector_letras: Vec<_> = lista_abecedario.choose_multiple (&mut rng, 3).collect();
+        //En el vector se agregan 3 números elegidos por el azar.
+        let vector_numeros: Vec<_> = lista_numero.choose_multiple (&mut rng, 3).collect();
+        //La letra 1 toma la posición 0 del vector de letras.
+        let mut letra1 = vector_letras[0].trim().to_string();
+        //La letra 2 toma la posición 1 del vector de letras.
+        let letra2 = vector_letras[1].trim().to_string();
+        //La letra 3 toma la posición 2 del vector de letras.
+        let letra3 = vector_letras[2].trim().to_string();
+        //El número 1 toma la posición 0 del vector de números.
+        let num1 = vector_numeros[0].trim().to_string();
+        //El número 2 toma la posición 1 del vector números.
+        let num2 = vector_numeros[1].trim().to_string();
+        //El número 3 toma la posición 2 del vector número.
+        let num3 = vector_numeros[2].trim().to_string();
+        //A la letra 1 se le agrega la letra 2.
+        letra1.push_str(&format!("{}", letra2));
+        //A la letra 1 se le agrega la letra 3.
+        letra1.push_str(&format!("{}", letra3));
+        //A la letra 1 se le agrega el número 1.
+        letra1.push_str(&format!("{}", num1));
+        //A la letra 1 se le agrega el número 2.
+        letra1.push_str(&format!("{}", num2));
+        //A la letra 1 se le agrega el número 3.
+        letra1.push_str(&format!("{}", num3));
+        
+        //Se evalúa si en el archivo hay algún código que se repita.
+        if texto.contains(&letra1){
+            //Si hay uno que lo contenga, continúa en el loop hasta que...
+            continue;
+        } else {
+            //En la búsqueda no encuentra ningún código igual, por lo que retorna el código para que sea ingresado
+            //en el archivo de texto. 
+            return letra1;
+        }
+        
+    }
+}
+
+//Función que lee el archivo.
+fn read_file(mut f: &File){
+    let mut text = String::new();
+    f.read_to_string(&mut text).unwrap();
+}
+
+//Función que crea un archivo de texto en blanco.
+fn create_blank_file(p: &Path){
+    let _file = File::create(p).expect("El archivo no pudo crearse");
+}
+
+//Función usada para abrir el archivo.
+fn open_file_to_append(p: &Path) -> File{
+    let mut binding = OpenOptions::new();
+    let binding = binding.append(true);
+    let file = match binding.open(p){
+        Err(_why) => panic!("No se puede abrir el archivo"),
+        Ok(file) => file,
+    };
+    return file
+}
+
+//Función que permite ingresar el nombre del libro que luego se agregará al archivo de texto.
+fn nombre() -> String{
+    println!("Nombre:");
+    let mut nombre_funcion = String::new();
+    stdin().read_line(&mut nombre_funcion).unwrap().to_string();
+    return nombre_funcion;
+}
+
+//Función que permite ingresar el autor del libro que luego se agregará al archivo de texto.
+fn autor() -> String{
+    println!("Autor:");
+    let mut autor_funcion = String::new();
+    stdin().read_line(&mut autor_funcion).unwrap().to_string();
+    return autor_funcion;
+}
+
+//Función que permite ingresar la editorial del libro que luego se agregará al archivo de texto.
+fn editorial() -> String{
+    println!("Editorial:");
+    let mut editorial_funcion = String::new();
+    stdin().read_line(&mut editorial_funcion).unwrap().to_string();
+    return editorial_funcion;
+}
+
+//Función que permite ingresar el género del libro que luego se agregará al archivo de texto.
+fn genero() -> String{
+    println!("Género:");
+    let mut genero_funcion = String::new();
+    stdin().read_line(&mut genero_funcion).unwrap().to_string();
+    return genero_funcion;
+}
+
+//Función que permite ingresar el idioma en el que se encuentra el libro, luego esta información
+//será agregada al archivo de texto.
+fn idioma() -> String{
+    println!("Idioma:");
+    let mut idioma_funcion = String::new();
+    stdin().read_line(&mut idioma_funcion).unwrap().to_string();
+    return idioma_funcion;
+}
+
+//Función que permite la edición a la que pertenece el libro, luego esta información será agregada
+//al archivo de texto.
+fn edicion() -> String{
+    println!("Edición:");
+    let mut edicion_funcion = String::new();
+    stdin().read_line(&mut edicion_funcion).unwrap().to_string();
+    return edicion_funcion;
+}
+
+//Función que permite ingresar el precio del libro que luego se agregará al archivo de texto.
+fn precio() -> i32{
+    let precio_funcion = loop{
+        println!("Precio:");
+        let mut precio_funcion = String::new();
+        stdin().read_line(&mut precio_funcion).unwrap().to_string();
+        //Se verifica que sea un número.
+        let precio_funcion:i32 = match precio_funcion.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                        println!("\n\tDebe ingresar un valor numérico");
+                        continue;
+            },
+        };
+        //Se verifica que no sea menor o igual a cero.
+        if precio_funcion <= 0 {
+            continue;
+        }else{
+            break precio_funcion;
+        }
+    };
+    return precio_funcion;
+}
+
+//Función que permite ingresar la cantidad disponible del libro que luego se agregará al archivo de texto.
+fn stock() -> i32{
+    let cantidad_disponible = loop{
+        println!("Cantidad disponible:");
+        let mut cantidad_disponible = String::new();
+        stdin().read_line(&mut cantidad_disponible).unwrap().to_string();
+        //Se verifica que sea un número.
+        let cantidad_disponible:i32 = match cantidad_disponible.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                        println!("\n\tDebe ingresar un valor numérico.");
+                        continue;
+            },
+        };
+        //Se verifica que no sea menor a cero.
+        if cantidad_disponible < 0 {
+            continue;
+        }else{
+            break cantidad_disponible;
+        }
+    };
+    
+    return cantidad_disponible;
+}
+
+//Función que permite ingresar la cantidad vendida del libro que luego será agregada al archivo de texto.
+fn vendido() -> i32{
+    let cantidad_vendida = loop{
+        println!("Cantidad vendida: ");
+        let mut cantidad_vendida = String::new();
+        stdin().read_line(&mut cantidad_vendida).unwrap().to_string();
+        //Se verifica que sea un número.
+        let cantidad_vendida:i32 = match cantidad_vendida.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                        println!("\n\tDebe ingresar un valor numérico");
+                        continue;
+            },
+        };
+        //Se verifica que no sea menor que cero.
+        if cantidad_vendida < 0 {
+            continue;
+        }else{
+            break cantidad_vendida;
+        }
+    };
+    return cantidad_vendida;
+}
+
+//Función que permite ingresar el encabezado al archivo de texto si es que no lo contiene.
+fn encabezado(p : &Path){
+    let encabezado_texto = "CÓDIGO,NOMBRE,AUTOR,EDITORIAL,GÉNERO,IDIOMA,EDICIÓN,PRECIO,STOCK,VENDIDO\n".to_string();
+    let texto = fs::read_to_string("Inventario.csv").expect("No se pudo abrir el archivo.");
+    if texto.contains(&encabezado_texto){
+        println!("");
+    }else {
+        let mut _file = open_file_to_append(p).write_all(encabezado_texto.as_bytes());
+    }
+}
+
+//Función que permite agregar nuevos libros al archivo de texto.
+fn datos(p: &Path){
+    loop{
+        //Se pide ingresar todos los datos del libro nuevo.
+        println!("Ingrese los siguientes datos:");
+        let codigo_loop = generador_codigo();
+        let nombre_loop = nombre();
+        let autor_loop = autor();
+        let editorial_loop = editorial();
+        let genero_loop = genero();
+        let idioma_loop = idioma();
+        let edicion_loop = edicion();
+        let precio_loop = precio();
+        let disponible_loop = stock();
+        let vendido_loop = vendido();
+
+        //Todos los datos ingresados se agregaran usando la estructura.
+        let mut _inventario_completo = Inventario{codigo: codigo_loop,
+                                                                nombre: nombre_loop,
+                                                                autor: autor_loop,
+                                                                editorial: editorial_loop,
+                                                                genero: genero_loop,
+                                                                idioma: idioma_loop,
+                                                                edicion: edicion_loop,
+                                                                precio: precio_loop,
+                                                                stock: disponible_loop,
+                                                                vendido: vendido_loop};
+    
+        //Se guardan en una variable con un formato para ingresar al archivo de texto.
+        let temp = format!("{},{},{},{},{},{},{},${},{},{}\n", _inventario_completo.codigo.trim(),
+                                                    _inventario_completo.nombre.trim(),
+                                                    _inventario_completo.autor.trim(),
+                                                    _inventario_completo.editorial.trim(),
+                                                    _inventario_completo.genero.trim(),
+                                                    _inventario_completo.idioma.trim(),
+                                                    _inventario_completo.edicion.trim(),
+                                                    _inventario_completo.precio,
+                                                    _inventario_completo.stock,
+                                                    _inventario_completo.vendido);
+    
+        //Los datos son ingresados al archivo de texto.
+        let mut _file = open_file_to_append(p).write_all(temp.as_bytes());
+
+        //Permite volver a ingresar otro libro.
+        println!("¿Desea agregar otro libro? Solo respuesta si o no.");
+        let mut continuar = String::new();
+        stdin().read_line(&mut continuar).unwrap().to_string();
+        if continuar.trim().to_uppercase() == "NO"{
+            break;
+        } else if continuar.trim().to_uppercase() == "SI"{
+            continue;
+        } else {
+            println!("Ha introducido un valor no válido, el programa se cerrará guardando los datos anteriormente introducidos.");
+            break;
+        }
+    }
+}
+
+//Función que permite encontrar información sobre el libro.
+fn busqueda(){
+    //Permite leer el archivo para que sea utilizado en la búsqueda del libro.
+    let texto = fs::read_to_string("Inventario.csv").expect("No se pudo abrir el archivo.");
+
+    //Si el inventario está vacío, envía este aviso. 
+    if texto == "CÓDIGO,NOMBRE,AUTOR,EDITORIAL,GÉNERO,IDIOMA,EDICIÓN,PRECIO,STOCK,VENDIDO\n"{
+        println!("No se ha añadido ningún libro a este inventario aún, intente otra función.");
+    }else{
+        //Comienza la búsqueda del libro que necesita.
+        println!("Ingrese el nombre del libro del cual necesita información:");
+        let mut consulta = String::new();
+        stdin().read_line(&mut consulta).unwrap();
+        //El println es para entregar resultados más ordenados, para que el administrador sepa a qué corresponde cada columna.
+        println!("\nCÓDIGO,NOMBRE,AUTOR,EDITORIAL,GÉNERO,IDIOMA,EDICIÓN,PRECIO,STOCK,VENDIDO");
+        //Es usado para que la línea 1 no sea evaluada en esta función, ya que corresponde al encabezado.
+        let mut contador = 0;
+        //Es usado para saber si, una vez terminada la búsqueda, se encontraron coincidencias.
+        let mut coincidencia = "";
+        //Quitar \n de cada linea del texto.
+        for a in texto.split("\n"){
+            contador += 1;
+            //Este condicional es usado para ignorar la primera fila que corresponde al encabezado.
+            if contador > 1{
+                //Quitar las ',' para realizar la búsqueda por posiciones.
+                for b in a.split(","){
+                    //Se evalúa si el libro consultado es el mismo.
+                    if b.to_uppercase().trim() == consulta.to_uppercase().trim(){
+                        //Si es que se encuentran coincidencias, la variable cambia su valor.
+                        coincidencia = "pasó";
+                        //Sirve para agregar todos los resultados que coinciden.
+                        println!("{}", a);
+                    }
+                }
+
+            }
+            //Si es que el valor de la variable no cambia cuando ya recorrió todo el archivo de texto, envía un mensaje
+            //diciendo que no se encontraron coincidencias.
+            if coincidencia == "" && a == ""{
+                println!("\n\tNo se encontraron coincidencias.\n");
+            }
+            contador += 1;
+        }
+        println!("\n");
+    }
+}
+
+//Función donde se realiza la modificación de los elementos en el archivo de texto.
+fn modificar_elemento(p : &Path){
+    let texto = fs::read_to_string("Inventario.csv").expect("No se pudo abrir el archivo.");
+
+    //Permite enviar un mensaje si el archivo está vacío.
+    if texto == "CÓDIGO,NOMBRE,AUTOR,EDITORIAL,GÉNERO,IDIOMA,EDICIÓN,PRECIO,STOCK,VENDIDO\n"{
+        println!("No se ha añadido ningún libro a este texto, intente otra función.");
+    }else{
+        //Se pregunta el nombre del libro que desea editar.
+        println!("¿Cuál es el nombre del libro que desea editar?");
+        let mut consulta = String::new();
+        stdin().read_line(&mut consulta).unwrap();
+        //Es usado para que se entreguen los resultados de manera ordenada y que el administrador
+        //sepa qué significa cada columna.
+        println!("\nCÓDIGO,NOMBRE,AUTOR,EDITORIAL,GÉNERO,IDIOMA,EDICIÓN,PRECIO,STOCK,VENDIDO");
+        //Es usado para evaluar si, luego de recorrer todo el texto, se encuentran coincidencias.
+        let mut coincidencia = "";
+        //Se usa para no tomar en cuenta la primera linea que corresponde al encabezado del archivo de texto.
+        let mut contador = 0;
+        //Quita los saltos de línea.
+        for a in texto.split("\n"){
+            contador += 1;
+            //No toma en cuenta la primera linea que corresponde al encabezado del archivo de texto.
+            if contador > 1{
+                //Quitar las ',' para realizar la búsqueda por posiciones.
+                for b in a.split(","){
+                    //Se evalúa si el libro consultado es el mismo.
+                    if b.to_uppercase().trim() == consulta.to_uppercase().trim(){
+                        //Si es que se encuentran coincidencias, la variable cambia su valor.
+                        coincidencia = "pasó";
+                        //Sirve para agregar todos los resultados que coinciden.
+                        println!("{}", a);
+                    }
+                }
+    
+            }
+            //Si es que el valor de la variable no cambia cuando ya recorrió todo el archivo de texto, envía un mensaje
+            //diciendo que no se encontraron coincidencias.
+            if coincidencia == "" && a == ""{
+                println!("\n\tNo se encontraron coincidencias.\n");
+            }
+            
+        }
+        println!("\n");
+
+        //Si no se encuentran coincidencias, no pregunta por los cambios.
+        if coincidencia == "pasó"{
+            let mut contador_linea = 0;
+
+            for _x in texto.split("\n"){
+                contador_linea += 1;
+                if contador_linea > 1{
+                    //Para encontrar el libro en específico, se solicita ingresar el código.
+                    println!("Ingrese el código del libro que desea editar:");
+                    let mut cod_consulta = String::new();  
+                    stdin().read_line(&mut cod_consulta).unwrap();
+
+                    //Se vacía el archivo para reescribir en el con el cambio incluído.
+                    let text = "";
+                    let mut archivo = File::create("Inventario.csv").unwrap();
+                    archivo.write_all(text.as_bytes()).unwrap();
+                    //La variable es usada para que luego se evalúe si ya se hizo el cambio en la fila que correspondía.
+                    let mut help = false;
+
+                    //Se consulta qué elemento del libro desea editar.
+                    println!("¿Qué elemento del libro desea modificar?");
+                    let mut modificacion = String::new();
+                    stdin().read_line(&mut modificacion).unwrap().to_string();
+
+                    //Se cambia lo que ingresa por números para que sea más fácil manipular.
+                    let que_modificar = match modificacion.to_uppercase().trim(){
+                        "CODIGO" | "CÓDIGO" => "\n\tNo puede ser modificado el código.",
+                        "NOMBRE" => "1",
+                        "AUTOR" => "2",
+                        "EDITORIAL" => "3",
+                        "GÉNERO" | "GENERO" => "4",
+                        "IDIOMA" => "5",
+                        "EDICIÓN" | "EDICION" => "6",
+                        "PRECIO" => "7",
+                        "STOCK" => "8",
+                        "VENDIDO" => "9",
+                        _ => "Ingrese correctamente el dato",
+                    };
+
+                    //Se pide ingresar el cambio que realizará.
+                    println!("Ingrese el cambio: ");
+                    //La variable cambio solo es usada para que luego se vaya juntando la nueva fila modificada.
+                    let mut cambio = "".to_string();
+                    //Se hace para no toamr en cuenta la primera fila, que corresponde al encabezado
+                    //del archivo de texto.
+                    let mut contador_linea = 0;
+
+                    //Para encontra el código del libro y realizarle las modificaciones a esa fila en particular.
+                    //También es para que quede en la misma posición que estaba.
+                    for d in texto.split("\n"){
+                        contador_linea += 1;
+                        //Es para no considerar la primera fila, ya que es el encabezado del archivo de texto.
+                        if contador_linea > 1{
+                            //Contador para saber la columna de la fila que se va a trabajar.
+                            let mut contador = 0;
+                            for f in d.split(","){
+                                //Si coinciden los códigos, se procede a hacer los cambios.
+                                if f.to_uppercase().trim() == cod_consulta.to_uppercase().trim(){
+                                    //Se hace un nuevo recuento para que sea más ordenada la búsqueda y el cambio.
+                                    for e in d.split(","){
+                                        //Si se quiere modificar el código, no se puede hacer.
+                                        if contador == 0 && que_modificar == "\n\tNo puede ser modificado el código."{
+                                            println!("{}", que_modificar);
+                                            cambio.push_str(&format!("{},", e));
+                                        //Se agrega a la variable cambio.
+                                        }else if contador == 0{
+                                            cambio.push_str(&format!("{},", e)); 
+                                        };
+                                        //Si se quiere modificar el nombre, el contador debe ser igual a 1.
+                                        if contador == 1 && que_modificar == "1"{
+                                            //Se pide ingresar el nuevo nombre.
+                                            let ingreso_modificacion = nombre();
+                                            //Se agrega el ingreso de modificación a la variable cambio.
+                                            cambio.push_str(&format!("{},", ingreso_modificacion.trim()));
+                                        //Si no se quiere modificar el nombre, simplemente se agrega tal cual como está a la variable cambio.
+                                        }else if contador == 1{
+                                            cambio.push_str(&format!("{},", e));
+                                        }
+                                        //Si se quiere modificar el autor, el contador debe ser igual a 2.
+                                        if contador == 2 && que_modificar == "2"{
+                                            //Se pide ingresar el nuevo autor.
+                                            let ingreso_modificacion = autor();
+                                            //Se agrega el ingreso de modificación a la variable cambio.
+                                            cambio.push_str(&format!("{},", ingreso_modificacion.trim()));
+                                        //Si no se quiere modificar el autor, simplemente se agrega tal cual como está a la variable cambio.
+                                        }else if contador == 2{
+                                            cambio.push_str(&format!("{},", e));
+                                        }
+                                        //Si se quiere modificar la editorial, el contador debe ser igual a 3.
+                                        if contador == 3 && que_modificar == "3"{
+                                            //Se pide ingresar la nueva editorial.
+                                            let ingreso_modificacion = editorial();
+                                            //Se agrega el ingreso de modificación a la variable cambio.
+                                            cambio.push_str(&format!("{},", ingreso_modificacion.trim()));
+                                        //Si no se quiere modificar la editorial, simplemente se agrega tal cual como está a la variable cambio.
+                                        }else if contador == 3{
+                                            cambio.push_str(&format!("{},", e));
+                                        }
+                                        //Si se quiere modificar el género, el contador debe ser igual a 4.
+                                        if contador == 4 && que_modificar == "4"{
+                                            //Se pide ingresar el nuevo género.
+                                            let ingreso_modificacion = genero();
+                                            //Se agrega el ingreso de modificación a la variable cambio.
+                                            cambio.push_str(&format!("{},", ingreso_modificacion.trim()));
+                                        //Si no se quiere modificar el género, simplemente se agrega tal cual como está a la variable cambio.
+                                        }else if contador == 4{
+                                            cambio.push_str(&format!("{},", e));
+                                        }
+                                        //Si se quiere modificar el idioma, el contador debe ser igual a 5.
+                                        if contador == 5 && que_modificar == "5"{
+                                            //Se pide ingresar el nuevo idioma.
+                                            let ingreso_modificacion = idioma();
+                                            //Se agrega el ingreso de modificación a la variable cambio.
+                                            cambio.push_str(&format!("{},", ingreso_modificacion.trim()));
+                                        //Si no se quiere modificar el idioma, simplemente se agrega tal cual como está a la variable cambio.
+                                        }else if contador == 5{
+                                            cambio.push_str(&format!("{},", e));
+                                        }
+                                        //Si se quiere modificar la edición, el contador debe ser igual a 6.
+                                        if contador == 6 && que_modificar == "6"{
+                                            //Se pide ingresar la nueva edición.
+                                            let ingreso_modificacion = edicion();
+                                            //Se agrega el ingreso de modificación a la variable cambio.
+                                            cambio.push_str(&format!("{},", ingreso_modificacion.trim()));
+                                        //Si no se quiere modificar la edición, simplemente se agrega tal cual como está a la variable cambio.
+                                        }else if contador == 6{
+                                            cambio.push_str(&format!("{},", e));
+                                        }
+                                        //Si se quiere modificar el precio, el contador debe ser igual a 7.
+                                        if contador == 7 && que_modificar == "7"{
+                                            //Se pide ingresar el nuevo precio.
+                                            let ingreso_modificacion = precio();
+                                            //Se agrega el ingreso de modificación a la variable cambio.
+                                            cambio.push_str(&format!("${},", ingreso_modificacion));
+                                        //Si no se quiere modificar el precio, simplemente se agrega tal cual como está a la variable cambio.
+                                        }else if contador == 7{
+                                            cambio.push_str(&format!("{},", e));
+                                        }
+                                        //Si se quiere modificar el stock, el contador debe ser igual a 8.
+                                        if contador == 8 && que_modificar == "8"{
+                                            //Se pide ingresar el nuevo stock.
+                                            let ingreso_modificacion = stock();
+                                            //Se agrega el ingreso de modificación a la variable cambio.
+                                            cambio.push_str(&format!("{},", ingreso_modificacion));
+                                        //Si no se quiere modificar el stock, simplemente se agrega tal cual como está a la variable cambio.
+                                        }else if contador == 8{
+                                            cambio.push_str(&format!("{},", e));
+                                        }
+                                        //Si se quiere modificar la cantidad vendida, el contador debe ser igual a 9.
+                                        if contador == 9 && que_modificar == "9"{
+                                            //Se pide ingresar la nueva cantidad vendida.
+                                            let ingreso_modificacion = vendido();
+                                            //Se agrega el ingreso de modificación a la variable cambio.
+                                            cambio.push_str(&format!("{}\n", ingreso_modificacion));
+                                        //Si no se quiere modificar la cantidad vendida, simplemente se agrega tal cual como está a la variable cambio.
+                                        }else if contador == 9{
+                                            cambio.push_str(&format!("{}\n", e));
+                                        }
+                                        contador += 1;
+                                    }
+                                    //Se agrega la fila con modificaciones en la misma posición que estaban antes.
+                                    let mut _file = open_file_to_append(p).write_all(cambio.as_bytes());
+                                    help = true;
+                                    
+                                };
+                            }
+                            //Si es que se realiza el cambio en la columna que corresponde, agrega las filas siguientes filas como corresponden
+                            if help == true{
+                                help = false;
+                                continue;
+                            //Evalúa las filas que están antes y después de la que corresponde realizar la modificación.
+                            }else{
+                                //Para que no se considere la fila vacía y no haga un salto de línea extra.
+                                if d == ""{
+                                    continue;
+                                }else{
+                                    //Se agregan todas las otras columnas en las que no se hizo modificación, 
+                                    //se agregan en el orden en el que se encontraban.
+                                    let temp = format!("{}\n", d);
+                                    let mut _file = open_file_to_append(p).write_all(temp.as_bytes());
+
+                                }
+                            }
+                        }else {
+                            let temp = format!("CÓDIGO,NOMBRE,AUTOR,EDITORIAL,GÉNERO,IDIOMA,EDICIÓN,PRECIO,STOCK,VENDIDO\n");
+                            let mut _file = open_file_to_append(p).write_all(temp.as_bytes());
+                            
+                        }
+                    }
+                    break;
+                }
+            }       
+        }
+    }
+}
+
+//Función que permite encontrar los libros del mismo género.
+fn busqueda_genero(){
+    //Permite leer el archivo para que sea utilizado en la búsqueda del libro.
+    let texto = fs::read_to_string("Inventario.csv").expect("No se pudo abrir el archivo.");
+    //Usado luego para no considerar la primera fila del archivo de texto, la cual es el encabezado de este.
+    let mut contador = 0;
+
+    //Si el inventario está vacío, envía este aviso. 
+    if texto == "CÓDIGO,NOMBRE,AUTOR,EDITORIAL,GÉNERO,IDIOMA,EDICIÓN,PRECIO,STOCK,VENDIDO\n"{
+        println!("No se ha añadido ningún libro a este inventario aún, intente otra función.");
+    }else{
+        for _help in texto.split("\n"){
+            contador += 1;
+            //Es para no considerar la primera fila, que corresponde al encabezado del archivo de texto.
+            if contador > 1{
+                //Pide ingresar el género.
+                println!("Ingrese el género de interés:");
+                let mut consulta = String::new();
+                stdin().read_line(&mut consulta).unwrap();
+                //Este println es para entregar resultados más ordenados, y para que el administrador
+                //sepa qué significa cada columna.
+                println!("\nCÓDIGO,NOMBRE,AUTOR,EDITORIAL,GÉNERO,IDIOMA,EDICIÓN,PRECIO,STOCK,VENDIDO");
+                //Quitar \n de cada linea del texto.
+                let mut contador2 = 0;
+                //Para que posteriormente se evalúe si se encontraron coincidencias.
+                let mut coincidencia = "";
+                //Recorrer el texto para encontrar las coincidencias en el mismo tipo de género.
+                for a in texto.split("\n"){
+                    contador2 += 1;
+                    //Para que no se considere la primera fila, que es el encabezado del archivo de texto.
+                    if contador2 > 1{
+                        //Quitar las ',' para realizar la búsqueda por posiciones.
+                        for b in a.split(","){
+                            //Se evalúa si el libro consultado es el mismo.
+                            if b.to_uppercase().trim() == consulta.to_uppercase().trim(){
+                                coincidencia = "pasó";
+                                //Sirve para agregar todos los resultados que coinciden.
+                                println!("{}", a);
+                            }
+                        }
+                    }
+                    //Si es que el valor de la variable coincidencia no cambia cuando termina de recorrer el texto,
+                    //significa que no se encontraron coincidencias y envía el mensaje de que no se encontraron
+                    //coincidencias según lo ingresado.
+                    if coincidencia == "" && a == ""{
+                        println!("\n\tNo se encontraron coincidencias.\n");
+                    }
+                }
+                println!("\n");
+                break;
+            }
+            
+
+        }
+        
+    }
+}
+
+//Función donde se ejecuta lo que desee realizar el usuario.
+fn menu_funcion(p: &Path){
+    loop {
+        println!("Seleccione lo que desea realizar:
+        0. Salir del programa.
+        1. Agregar un nuevo libro.
+        2. Modificar información de un libro.
+        3. Buscar información de un libro.
+        4. Buscar libros por mismo género.");
+        let mut menu = String::new();
+        stdin().read_line(&mut menu).unwrap();
+        let menu_help = menu.trim();
+        let mut _help = match menu_help{
+            "0" => break,
+            "1" => datos(p),
+            "2" => modificar_elemento(p),
+            "3" => busqueda(),
+            "4" => busqueda_genero(),
+            _ => println!("valor incorrecto, intente de nuevo"),
+        };
+    }
+}
+
+//Permite abrir el archivo para leerlo si es que existe.
+fn open_file_to_read(p: &Path){
+    //Si el archivo existe...
+    if Path::new(p).exists(){
+        //Abrir el archivo.
+        let file = match File::open(&p){
+            //Si no se puede abrir envía un mensaje.
+            Err(_why) => panic!("El archivo no se puede abrir..."),
+            //Si se puede abrir, entrega el archivo.
+            Ok(file) => file,
+        };
+        //Utiliza la función de leer el archivo.
+        read_file(&file)
+        //Si no existe el archivo..
+    } else {
+        //Crea uno en blanco.
+        create_blank_file(p);
+    }
+    
+}
+
+fn main(){
+    //Crea el archivo si es que no existe.
+    let path = Path::new("Inventario.csv");
+    //Utiliza la función para abrir el archivo y leerlo.
+    open_file_to_read(path);
+    //Se ejecuta la función de encabezado del archivo de texto.
+    encabezado(path);
+    //Se ejecuta el menú del programa.
+    menu_funcion(path);
+}
